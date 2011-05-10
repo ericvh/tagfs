@@ -1,0 +1,4 @@
+now kept here using contrib(1) from fgb.
+Look at /n/sources/contrib/nemo/root/sys/src/cmd/tags
+for the source, at .../sys/man/1/mktags for the man page.
+or use contrib/pull instead.

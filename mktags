@@ -1,0 +1,16 @@
+#!/bin/rc
+if (~ $#* 0 1){
+	echo usage: $0 '[-d]' db file... >[1=2]
+	exit usage
+}
+
+dflag=()
+if(~ $1 -d -dd){
+	dflag=$1
+	shift
+}
+db=$1
+shift
+
+time tagfiles  $dflag $db.trie.db $*
+time qhash $dflag -c $db.hash.db $*

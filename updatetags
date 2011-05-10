@@ -1,0 +1,12 @@
+#!/bin/rc
+rfork ne
+9fs planb
+bind -b /n/planb/386/bin /bin
+files=`{changes -fp 1m $home echo}
+if (~ $#files 0)
+	exit ''
+
+mount -c /srv/$user.tagfs /mnt/tags || exit notags
+tagfiles  /mnt/tags $files
+qhash -c $home/lib/$user.hash.db $files
+exit ''

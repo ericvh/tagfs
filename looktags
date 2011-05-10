@@ -1,0 +1,88 @@
+#!/bin/rc
+rfork ne
+if (~ $#* 0 ){
+	echo usage: '[DB=dbfile]' $0 '[-n]' tag... >[1=2]
+	exit usage
+}
+prg=$0
+
+nflag=()
+if(~ $1 -n){
+	nflag=$1
+	shift
+}
+switch($#DB){
+case 0
+	# no args. Try the home and the sys dbs
+	DB=($home/lib/$user /lib/sys)
+	$prg $nflag $*
+	exit ''
+case 1
+	# use just that db
+	db=$DB
+case *
+	# try each db in turn
+	xdb=$DB
+	for(a in $xdb){
+		DB=$a $prg $nflag $*
+	}
+	exit ''
+}
+toks=$*
+expr=`{echo $toks | sed 's/[ :]+/|/g'}
+
+# if tagfs is serving the db we want, prepare to use it.
+srvf=`{basename $db .trie.db}^.tagfs
+if (! test -e /mnt/tags/ctl && test -e /srv/$srvf)
+	mount -c /srv/$srvf /mnt/tags
+
+# if no local tagfs, prepare to use a per-network one.
+if (! test -e /mnt/tags/ctl){
+	if(! ~ $#searchserver 0)
+		shost=$searchserver
+	if not {
+		shost=`{echo 'tcp!$search!9fs' | 
+			ndb/csquery >[2]/dev/null | 
+			sed -e 's/> //g' -e 's/.*clone //' -e 's/!.*//' | sed 1q}
+	}
+	if(~ $#shost 1){
+		import -c $shost '#s' /n/s
+		if (test -e /n/s/$srvf)
+			mount -c /n/s/$srvf /mnt/tags
+	}
+}
+# use the tagfs found if avail,
+# otherwise, resort to rdtrie
+if ( test -e /mnt/tags/ctl){
+	f=/mnt/tags/query.$pid
+	echo $toks > $f
+	files=`{cat $f}
+	unmount /mnt/tags
+}
+if not {
+	if (test -e $db.trie.db){
+		files=`{rdtrie $db.trie.db $toks |sed 100q}
+	}
+	if not {
+		echo $db.trie.db : no database >[1=2]
+		exit nodb
+	}
+}
+
+# now translate file qids to file names
+# and rely on grep(1) to print lines if requested.
+if(~ $files 'no matches')
+	files=()
+if(~ $#files 0)
+	echo no matches
+if not {
+	if(~ $#nflag 0)
+		qhash $db.hash.db $files
+	if not {
+		qhash $db.hash.db $files |
+		while(f=`{read}) {
+			{ grep -n $"expr $f /dev/null || echo $f }| sed 10q
+		}
+	}
+}
+exit ''
