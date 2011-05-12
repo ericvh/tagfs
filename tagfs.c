@@ -35,7 +35,7 @@ fscreate(Req* r)
 	file = r->fid->file;
 	name = r->ifcall.name;
 	uid = r->fid->uid;
-	mode = r->fid->file->mode & 0x777 & r->ifcall.perm;
+	mode = r->fid->file->dir.mode & 0x777 & r->ifcall.perm;
 	mode |= (r->ifcall.perm & ~0x777);
 	if(mode&DMDIR){
 		respond(r, "queries cannot be directories");
@@ -48,10 +48,10 @@ fscreate(Req* r)
 		f->aux = q;
 		closefile(r->fid->file);
 		r->fid->file = f;
-		r->ofcall.qid = f->qid;
+		r->ofcall.qid = f->dir.qid;
 		respond(r, nil);
 	} else
-		responderror(r);
+		respond(r, "problem creating file");
 }
 
 void
@@ -112,20 +112,20 @@ ctlwrite(Req* r)
 	} else if(strcmp(toks[0], "sync") == 0){
 		fd = create(ttfname, OWRITE, 0664);
 		if(fd < 0){
-			responderror(r);
+			respond(r, "bad fid");
 			return;
 		}
 		Binit(&bout, fd, OWRITE);
 		if(wrtrie(&bout, trie) < 0){
 			close(fd);
 			remove(ttfname);
-			responderror(r);
+			respond(r, "wrtrie failure");
 			return;
 		}
 		Bterm(&bout);
 		close(fd);
 		if(rename(tfname, ttfname) < 0){
-			responderror(r);
+			respond(r, "rename failure");
 			remove(ttfname);
 			return;
 		}
@@ -295,7 +295,7 @@ fsclunk(Fid* fid)
 		freeexpr(q->expr);
 		free(q);
 		f->aux = nil;
-		incref(f);
+		incref(&f->ref);
 		removefile(f);
 	}
 }
@@ -332,11 +332,11 @@ void
 usage(void)
 {
 	fprint(2, "usage: %s [-abcD] [-s srv] [-m mnt] trie\n", argv0);
-	exits("usage");
+	threadexits("usage");
 }
 
 void
-main(int argc, char* argv[])
+threadmain(int argc, char* argv[])
 {
 	char*	mnt;
 	char*	srv;
@@ -392,6 +392,6 @@ main(int argc, char* argv[])
 	sfs.tree =  alloctree(nil, nil, DMDIR|0777, nil);
 	user = getuser();
 	ctlf = createfile(sfs.tree->root, "ctl", user, 0666, nil);
-	postmountsrv(&sfs, srv, mnt, mflag);
-	exits(nil);
+	threadpostmountsrv(&sfs, srv, mnt, mflag);
+	threadexits(nil);
 }
