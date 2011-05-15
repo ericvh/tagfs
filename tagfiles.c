@@ -42,37 +42,37 @@ struct Ext {
  */
 
 Prog progs[] = {
-	{"c program", 	"/bin/tagc",	1},
-	{"limbo program", "/bin/taglimbo", 1},
+	{"c program", 	"tagc",	1},
+//	{"limbo program", "taglimbo", 1},
 	{"ascii", 	"tagtext",	1},
 	{"english",	"tagtext",	1},
 	{"latin",	"tagtext",	1},
 	{"troff input",	"tagtext",	1},
 	{"email file",	"tagtext",	1},
 	{"troff -ms input", "tagtext",	1},
-	{"HTML file",	"/bin/taghtml",	0},
-	{"manual page",	"/bin/tagman",	1},
-	{"rc executable", "/bin/tagrc",	1},
-	{"rich text",	"/bin/tagdoc",	0},
+//	{"HTML file",	"taghtml",	0},
+//	{"manual page",	"tagman",	1},
+//	{"rc executable", "tagrc",	1},
+//	{"rich text",	"tagdoc",	0},
 };
 
 Ext exts[] = {
-	{".c",	2, "/bin/tagc",	1},
-	{".h",	2, "/bin/tagc",	1},
-	{".b",	2, "/lib/taglimbo",	1},
-	{".m",	2, "/bin/taglimbo",	1},
-	{".ms",	3, "/bin/tagtroff",	1},
-	{".mf",	3, "/bin/tagtroff",	1},
-	{".ps",	2, "/bin/tagps",	1},
+	{".c",	2, "tagc",	1},
+	{".h",	2, "tagc",	1},
+//	{".b",	2, "taglimbo",	1},
+//	{".m",	2, "taglimbo",	1},
+//	{".ms",	3, "tagtroff",	1},
+//	{".mf",	3, "tagtroff",	1},
+//	{".ps",	2, "tagps",	1},
 	{".db", 3, "DONTTAG",		0},
 	{".log", 4, "DONTTAG",		0},
-	{".doc", 4, "/bin/tagdoc",	0},
-	{".xls", 4, "/bin/tagdoc",	0},
-	{".ppt", 4, "/bin/tagdoc",	0},
-	{".rtf", 4, "/bin/tagdoc",	0},
-	{".pdf", 4, "/bin/tagpdf",	0},
-	{".eps", 4, "/bin/tageps",	0},
-	{".css", 4, "/bin/taghtml",	0},
+//	{".doc", 4, "tagdoc",	0},
+//	{".xls", 4, "tagdoc",	0},
+//	{".ppt", 4, "tagdoc",	0},
+//	{".rtf", 4, "tagdoc",	0},
+//	{".pdf", 4, "tagpdf",	0},
+//	{".eps", 4, "tageps",	0},
+//	{".css", 4, "taghtml",	0},
 };
 
 void
@@ -104,8 +104,8 @@ runfile(char* fname)
 		close(fd[0]);
 		dup(fd[1], 1);
 		close(fd[1]);
-		execl("/bin/file", "file", fname, nil);
-		sysfatal("runfile: %r");
+		execl("file", "file", fname, nil);
+		sysfatal("runfile: %s %r", fname);
 	default:
 		close(fd[1]);
 		n = 0;
