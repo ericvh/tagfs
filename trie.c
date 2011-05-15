@@ -69,10 +69,10 @@ getkey(Trie* t, Rune k)
 }
 
 static int
-ecmp(void* r1, void* r2)
+ecmp(const void* r1, const void* r2)
 {
-	Tent* e1 = r1;
-	Tent* e2 = r2;
+	const Tent* e1 = r1;
+	const Tent* e2 = r2;
 
 	return e1->r - e2->r;
 }

@@ -168,12 +168,6 @@ addvals(Vals* vals, Trie* t)
 }
 
 static void
-delvals(Vals* vals)
-{
-	vals->nv = 0;
-}
-
-static void
 freevals(Vals* vals)
 {
 	if(vals){
