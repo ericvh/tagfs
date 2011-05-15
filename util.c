@@ -68,8 +68,9 @@ cleanpath(char* file)
 		return s;
 }
 
+#ifdef ONPLAN9
 int
-rename(char* to, char* frompath)
+myrename(char* to, char* frompath)
 {
 	Dir	d;
 	char*	p;
@@ -84,3 +85,10 @@ rename(char* to, char* frompath)
 		return -1;
 	return 0;
 }
+#else
+int
+myrename(char *to, char *frompath)
+{
+	return rename(frompath, to);
+}
+#endif

@@ -124,7 +124,7 @@ ctlwrite(Req* r)
 		}
 		Bterm(&bout);
 		close(fd);
-		if(rename(tfname, ttfname) < 0){
+		if(myrename(tfname, ttfname) < 0){
 			respond(r, "rename failure");
 			remove(ttfname);
 			return;

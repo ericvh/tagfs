@@ -402,7 +402,7 @@ main(int argc, char* argv[])
 			sysfatal("%s: %r", ttfname);
 		Bterm(&bout);
 		close(fd);
-		if(rename(tfname, ttfname) <0)
+		if(myrename(tfname, ttfname) <0)
 			sysfatal("can't rename %s to %s: %r", ttfname, tfname);
 //		freetrie(t);
 	} else{
